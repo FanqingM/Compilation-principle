@@ -1,4 +1,6 @@
 import networkx as nx
+from networkx.classes.function import to_undirected
+import numpy as np
 from graphviz import Digraph
 from networkx.algorithms.shortest_paths.weighted import single_source_bellman_ford
 from networkx.classes import digraph
@@ -122,10 +124,6 @@ class ExpToNFA:
             self.transitions.append((a.begin_state,a.symbol,a.end_state))
             self.transitions.append((b.begin_state,b.symbol,b.end_state))
          
-        
-
-       
-        
         node=self.Nodes.make_node(a.begin_state,'+',b.end_state)
         self.nodes.pop(self.top+1)
         self.nodes.pop(self.top)
@@ -149,6 +147,28 @@ class ExpToNFA:
         node=self.Nodes.make_node(current_state,'|',current_state+1)
         self.nodes.pop(self.top)
         self.nodes.insert(self.top,node)
+    
+    def print_matrix(self):
+        trans=[]
+        alphabet=list(self.alphabet)
+        alphabet.append('#')
+        for i in range(self.current_state):
+            for j in range(len(alphabet)):
+                trans.append('-')
+        trans=np.array(trans)
+        trans=trans.reshape(self.current_state,len(alphabet))
+        for edge in self.transitions:
+            trans[int(edge[0])][alphabet.index(str(edge[1]))]=edge[2]
+        print("   ",end='')
+        for state in alphabet:
+            print(state,end=' ')
+        print('')
+        for i in range(trans.shape[0]):
+            print('{:<3d}'.format(i),end='')
+            for j in range(trans.shape[1]):
+                print('%s' % trans[i][j],end=' ')
+            print('')
+
 
 
 
@@ -158,9 +178,10 @@ class ExpToNFA:
         symbol,connection=model.classify(squence)
         model.init_node(symbol)
         i=0
-        while(len(model.nodes)>1 or len(connection)!=0):
+        while(len(model.nodes)>1 and len(connection)!=0):
             if(connection[i]=='|'):
                 if (i+1<len(connection) and connection[i+1]=='('):
+                    isFirst=False
                     model.top+=1
                     connection.pop(i+1)
                     i+=1
@@ -169,6 +190,7 @@ class ExpToNFA:
                     connection.pop(i)
             elif(connection[i]=='-'):
                 if (i+1<len(connection) and connection[i+1]=='('):
+                    isFirst=False
                     model.top+=1
                     connection.pop(i+1)
                     i+=1
@@ -179,15 +201,22 @@ class ExpToNFA:
                 model.handle_closure(model.nodes[model.top])
                 connection.pop(i)
             elif(connection[i]==')'):
-                model.top-=1
-                connection.pop(i)
-                i-=1       
+                if(not isFirst):
+                    model.top-=1
+                    connection.pop(i)
+                    i-=1
+                else:
+                    connection.pop(i)
+            elif(connection[i]=='('):
+                isFirst=True
+                connection.pop(i)   
         model.Print()
         nfa=Digraph('G',filename='NFA.gv',format='png')
         for i in range(len(model.transitions)):
             n1,sym,n2=str(model.transitions[i][0]),model.transitions[i][1],str(model.transitions[i][2])
             nfa.edge(n1,n2,label=sym)
         nfa.view()
+        model.print_matrix()
             
     
     def Print(self):
@@ -195,7 +224,8 @@ class ExpToNFA:
 
 #test              
 entity=ExpToNFA()
-entity.convert('a*b(c|d)e')
-# entity.convert('l(l|d)*')
+# entity.convert('a*b(c|d)e')
+# entity.convert('(a|b)*cba')
+entity.convert('l(l|d)*')
 
     
