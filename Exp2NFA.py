@@ -26,7 +26,7 @@ class ExpToNFA:
         self.state_loss=0 #需要剪掉的状态数
         self.nodes=[] #标识符转化成的node
         self.Nodes=Node()
-        self.top=0 #栈顶指针
+        self.top=-1 #栈顶指针
 
     def add_state(self,state):
         self.states.add(state)
@@ -50,6 +50,7 @@ class ExpToNFA:
     
     #分出起始符和连接符
     def classify(self,squence):
+       
         squence=list(squence)
         symbol=[]
         connection=[]
@@ -58,12 +59,11 @@ class ExpToNFA:
             i=0
             if(squence[i]<='z' and squence[i]>='a'):
                 symbol.append(squence[i])
+                if(i+1<len(squence) and squence[i+1]<='z' and squence[i+1]>='a' ):
+                    connection.append('-')
+                elif (i+1<len(squence) and squence[i+1]=='('):
+                    connection.append('-')
                 squence.pop(i)
-                if(i<len(squence) and squence[i]<='z' and squence[i]>='a' ):
-                    connection.append('-')
-                    squence.pop(i)
-                elif (i<len(squence) and squence[i]=='('):
-                    connection.append('-')
             
                
             else:
@@ -73,6 +73,59 @@ class ExpToNFA:
                     connection.append('-')   
                 squence.pop(i)              
         return symbol,connection
+
+    #获取节点中缀表达式
+    def getInfix(self,squence):
+        i=0
+        infix=list()
+        while(len(squence)>0):
+             if(squence[i]<='z' and squence[i]>='a'):
+                 infix.append(squence[i])
+                 if(i+1<len(squence) and squence[i+1]<='z' and squence[i+1]>='a' ):
+                    infix.append('-')
+                 elif (i+1<len(squence) and squence[i+1]=='('):
+                    infix.append('-')
+                 squence.pop(i)
+                 
+             else:
+                infix.append(squence[i])
+                if(i+1<len(squence) and (squence[i]=='*' or squence[i]==')') 
+                            and squence[i+1]<='z' and squence[i+1]>='a'):
+                    infix.append('-')   
+                squence.pop(i)      
+        
+        for x in range(len(infix)):
+            if(infix[x]<='z' and infix[x]>='a'):    
+                infix[x]=self.nodes[i]
+                i+=1
+                
+        return infix
+
+    #中缀转后缀
+    def infixToPostfix(self,infixexpr):
+        priority={"(":1,'-':3,'|':2,'*':4}
+        opStack = list()
+        postfixList = []
+        tokenList = list(infixexpr)
+        for token in tokenList:
+            if token!='(' and token!=')' and token!='*' and token !='|' and token !='-':
+                postfixList.append(token)
+            elif token == '(':
+                opStack.append(token)
+            elif token == ')':
+                topToken = opStack.pop()
+                while topToken != '(':
+                    postfixList.append(topToken)
+                    topToken = opStack.pop()
+            else:
+                while len(opStack)>0 and \
+                (priority[opStack[len(opStack)-1]] >= priority[token]):
+                    postfixList.append(opStack.pop())
+                opStack.append(token)
+
+        while len(opStack)>0:
+            postfixList.append(opStack.pop())
+        return postfixList
 
     #给所有标识符初始化起始状态和终止状态
     def init_node(self,symbol):
@@ -99,42 +152,34 @@ class ExpToNFA:
         self.current_state+=2
 
         node=self.Nodes.make_node(current_state,'|',current_state+1)
-        self.nodes.pop(self.top+1)
-        self.nodes.pop(self.top)
-        self.nodes.insert(self.top,node)
+        self.nodes.append(node)
    
     #处理ab
     def handle_join(self,a,b):
-
-      
         if(a.symbol=='|' or a.symbol=='+' or b.symbol=='|' or b.symbol=='+'):#左右至少一个节点集
             if(a.symbol>='a' and a.symbol<='z'):
                 self.transitions.append((a.begin_state,a.symbol,a.end_state))
                 self.transitions.append((a.end_state,'#',b.begin_state))
             if(b.symbol>='a' and b.symbol<='z'):
-                b.begin_state=a.end_state
-                b.end_state-=1
                 self.transitions.append((b.begin_state,b.symbol,b.end_state))
+                self.transitions.append((a.end_state,'#',b.begin_state))
             else:
                  self.transitions.append((a.end_state,'#',b.begin_state))
                 
         else:#左右都不是节点集
-            b.begin_state=a.end_state 
-            b.end_state-=1
             self.transitions.append((a.begin_state,a.symbol,a.end_state))
             self.transitions.append((b.begin_state,b.symbol,b.end_state))
+            self.transitions.append((a.end_state,'#',b.begin_state))
          
         node=self.Nodes.make_node(a.begin_state,'+',b.end_state)
-        self.nodes.pop(self.top+1)
-        self.nodes.pop(self.top)
-        self.nodes.insert(self.top,node)
-        self.state_loss+=1
+        self.nodes.append(node)
+        # self.state_loss+=1
 
     #处理a*
     def handle_closure(self,a):
         current_state=self.current_state
-        a.begin_state-=self.state_loss
-        a.end_state-=self.state_loss
+        # a.begin_state-=self.state_loss
+        # a.end_state-=self.state_loss
         if(a.symbol>='a' and a.symbol<='z'):
             self.transitions.append((a.begin_state,a.symbol,a.end_state))
 
@@ -144,9 +189,8 @@ class ExpToNFA:
         self.transitions.append((a.end_state,'#',current_state+1))
         self.current_state+=2
 
-        node=self.Nodes.make_node(current_state,'|',current_state+1)
-        self.nodes.pop(self.top)
-        self.nodes.insert(self.top,node)
+        node=self.Nodes.make_node(current_state,'#',current_state+1)
+        self.nodes.append(node)
     
     def print_matrix(self):
         trans=[]
@@ -170,46 +214,33 @@ class ExpToNFA:
             print('')
 
 
-
-
     def convert(self,exp):
+        
         model=ExpToNFA()
         squence=model.read_regular_expression(exp)
         symbol,connection=model.classify(squence)
         model.init_node(symbol)
-        i=0
-        while(len(model.nodes)>1 and len(connection)!=0):
-            if(connection[i]=='|'):
-                if (i+1<len(connection) and connection[i+1]=='('):
-                    isFirst=False
-                    model.top+=1
-                    connection.pop(i+1)
-                    i+=1
+        infix=model.getInfix(squence)
+        postfix=model.infixToPostfix(infix)
+        model.nodes=[]
+        for i in range(len(postfix)):
+            if(postfix[i] not in connection):
+                model.nodes.append(postfix[i])
+            else:
+                if(postfix[i]=='|'):
+                    node2=model.nodes.pop()
+                    node1=model.nodes.pop()
+                    model.handle_unite(node1,node2)
+                elif(postfix[i]=='-'):
+                    node2=model.nodes.pop()
+                    node1=model.nodes.pop()
+                    model.handle_join(node1,node2)
                 else:
-                    model.handle_unite(model.nodes[model.top],model.nodes[model.top+1])
-                    connection.pop(i)
-            elif(connection[i]=='-'):
-                if (i+1<len(connection) and connection[i+1]=='('):
-                    isFirst=False
-                    model.top+=1
-                    connection.pop(i+1)
-                    i+=1
-                else:
-                    model.handle_join(model.nodes[model.top],model.nodes[model.top+1])
-                    connection.pop(i)
-            elif(connection[i]=='*'):
-                model.handle_closure(model.nodes[model.top])
-                connection.pop(i)
-            elif(connection[i]==')'):
-                if(not isFirst):
-                    model.top-=1
-                    connection.pop(i)
-                    i-=1
-                else:
-                    connection.pop(i)
-            elif(connection[i]=='('):
-                isFirst=True
-                connection.pop(i)   
+                    node=model.nodes.pop()
+                    model.handle_closure(node)
+       
+        model.transitions=set(model.transitions)
+        model.transitions=list(model.transitions)
         model.Print()
         nfa=Digraph('G',filename='NFA.gv',format='png')
         for i in range(len(model.transitions)):
@@ -228,4 +259,4 @@ entity=ExpToNFA()
 # entity.convert('(a|b)*cba')
 entity.convert('l(l|d)*')
 
-    
+ 
