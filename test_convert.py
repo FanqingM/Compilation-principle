@@ -36,6 +36,7 @@ nfa.add_transition(6,'b',6)
 dfa=nfa_convert_to_dfa(nfa)
 
 dfa.print()
+dfa.draw()
 
 dfa1.states = dfa.states
 dfa1.start_state = dfa.start_states

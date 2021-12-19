@@ -1,5 +1,6 @@
 import networkx as nx
 from graphviz import Source
+from graphviz import Digraph
 
 
 class Automata:
@@ -74,26 +75,37 @@ class Automata:
         print("Transitions:", self.transitions)
         print("Alphabet:", self.alphabet)
 
-    ## 这是画图函数，环境原因没有实验
     def draw(self, filename=None):
-        G = nx.DiGraph()
-
+        # 实例化一个Digraph对象(有向图)，name:生成的图片的图片名，format:生成的图片格式
+        G = Digraph(name="NFATODFA", comment="test", format="png")
         for i in self.states:
-            s = 'doublecircle' if i in self.final_states else 'circle'
-            f = 'grey' if i == self.start_states else 'white'
-            G.add_node(i, shape=s, fillcolor=f, style='filled')
+            if i in self.final_states:
+                s = 'doublecircle'
+            else:
+                s = 'circle'
+            if i == self.start_states:
+                f = 'green'
+            else:
+                f = 'gray'
+            # s = 'doublecircle' if i in self.final_states else 'circle'
+            # f = 'grey' if i == self.start_state else 'green'
+            G.node(name = str(i),label = str(i),color = f,shape = s)
+            # G.add_node(i, shape=s, fillcolor=f, style='filled')
+
 
         for i, d in self.transitions.items():
             for k, v in d.items():
                 l = ','.join(v)
-                G.add_edge(i, k, label=l)
+                G.edge(str(i), str(k), label=l)
+        print(G.source)
+        
+        # 画图，filename:图片的名称，若无filename，则使用Digraph对象的name，默认会有gv后缀
+        # directory:图片保存的路径，默认是在当前路径下保存
+        G.view(filename="NFATODFA")
+        
+        # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
+        G.render(filename='NFATODFA',view=True)
 
-        plot = Source(nx.drawing.nx_agraph.to_agraph(G))
-
-        if not filename:
-            return plot
-        # plot.show()
-        plot.render(filename, format='png')
 
 def generateNFA(res: list):
     nfa=Automata()

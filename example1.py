@@ -42,7 +42,7 @@ b = "bbaa"
 # Print and Draw Before Diagram
 print('=' * 10, 'Before Minimization', '=' * 10)
 dfa.print()
-# dfa.draw("dfa_before")
+dfa.draw()
 
 # Minimize
 dfa.minimize()
