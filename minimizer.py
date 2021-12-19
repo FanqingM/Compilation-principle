@@ -1,6 +1,9 @@
 import networkx as nx
 from graphviz import Source
 
+def get_key (dict, value):
+    return [k for k, v in dict.items() if v == value]
+
 class DFA:
 
     def __init__(self):
@@ -140,3 +143,40 @@ class DFA:
 
                 for s in changes:
                     self.final_states.discard(fs)
+    
+    ## DFA代码化
+    def DFACode(self,variables):
+        res = ""
+        for i in range(len(variables)):
+            if variables[i] not in self.alphabet:
+                print("error")
+                break
+            if i == 0:
+                s = {variables[i]}
+                # temp是初态接受这个字母到达的状态的集合，是list
+                temp = get_key(self.transitions[self.start_state],s)
+                if len(temp) == 0:
+                    print("error")
+                    break
+                else:
+                    t_tmp = temp[0]
+                    # print(t_tmp)
+            else:
+                s = {variables[i]}
+                # print(s)
+                # print(t_tmp)
+                # temp是初态接受这个字母到达的状态的集合，是list
+                temp = get_key(self.transitions[t_tmp],s)
+                if len(temp) == 0:
+                    print("error")
+                    break
+                else:
+                    t_tmp = temp[0]
+                    # if(t_tmp in self.final_states):
+                    #     res+=variables[i]
+                    # print(t_tmp)
+        if t_tmp in self.final_states:
+            res = "<" + "V," + variables + ">"
+            print(res)
+            
+                

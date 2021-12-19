@@ -33,21 +33,21 @@ dfa.add_transition(4, 'b', 4)
 dfa.add_transition(5, 'a', 3)
 dfa.add_transition(5, 'b', 2)
 
-# b = "bbaa"
+b = "bbaa"
 # s = {b[0]}
 # print(get_key(dfa.transitions[1],s)[0])
 # print(dfa.start_state)
 
-# dfa.DFACode(b)
-# Print and Draw Before Diagram
-print('=' * 10, 'Before Minimization', '=' * 10)
-dfa.print()
-dfa.draw("dfa_before")
+dfa.DFACode(b)
+# # Print and Draw Before Diagram
+# print('=' * 10, 'Before Minimization', '=' * 10)
+# dfa.print()
+# dfa.draw("dfa_before")
 
-# Minimize
-dfa.minimize()
+# # Minimize
+# dfa.minimize()
 
-# Print and Draw After Diagram
-print('=' * 10, 'After Minimization', '=' * 10)
-dfa.print()
-# dfa.draw("dfa_after")
+# # Print and Draw After Diagram
+# print('=' * 10, 'After Minimization', '=' * 10)
+# dfa.print()
+# # dfa.draw("dfa_after")
