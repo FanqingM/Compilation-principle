@@ -1,6 +1,10 @@
 from Automata import Automata, nfa_convert_to_dfa
+from minimizer import DFA
 
+def get_key (dict, value):
+    return [k for k, v in dict.items() if v == value]
 nfa=Automata()
+dfa1 = DFA()
 
 # Add NFA States
 for i in range(0,8):
@@ -32,5 +36,24 @@ nfa.add_transition(6,'b',6)
 dfa=nfa_convert_to_dfa(nfa)
 
 dfa.print()
-dfa.draw('x.png')
+
+dfa1.states = dfa.states
+dfa1.start_state = dfa.start_states
+dfa1.final_states = dfa.final_states
+dfa1.transitions = dfa.transitions
+dfa1.alphabet = dfa.alphabet
+
+print(type(dfa1))
+# dfa1.print()
+# dfa1 = dfa
+
+# dfa1.print()
+# dfa.draw('x.png')
+
+# Minimize
+dfa1.minimize()
+
+# Print and Draw After Diagram
+print('=' * 10, 'After Minimization', '=' * 10)
+dfa1.print()
 

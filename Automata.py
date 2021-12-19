@@ -75,27 +75,6 @@ class Automata:
         print("Transitions:", self.transitions)
         print("Alphabet:", self.alphabet)
 
-    ## 这是画图函数，环境原因没有实验
-    def draw(self, filename=None):
-        G = nx.DiGraph()
-
-        for i in self.states:
-            s = 'doublecircle' if i in self.final_states else 'circle'
-            f = 'grey' if i == self.start_states else 'white'
-            G.add_node(i, shape=s, fillcolor=f, style='filled')
-
-        for i, d in self.transitions.items():
-            for k, v in d.items():
-                l = ','.join(v)
-                G.add_edge(i, k, label=l)
-
-        plot = Source(nx.drawing.nx_agraph.to_agraph(G))
-
-        if not filename:
-            return plot
-        # plot.show()
-        plot.render(filename, format='png')
-
 
 ## 子集法将nfa转为dfa
 def nfa_convert_to_dfa(nfa:Automata)->Automata:
@@ -127,6 +106,8 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
         index+=1
     dfa.add_final_state(count)
     return dfa
+ 
+        
 
 
 
