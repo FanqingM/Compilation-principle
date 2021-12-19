@@ -214,6 +214,19 @@ class ExpToNFA:
             print('')
 
 
+    def check_start(self):
+        states=list()
+        start_state=list()
+        for i in range(len(self.transitions)):
+            states.append(0)
+        for i in self.transitions:
+            states[i[2]-1]=1
+        for i in range(len(states)):
+            if(states[i]==0):
+                start_state.append(i+1)
+        return start_state[0]
+                
+
     def convert(self,exp):
         
         model=ExpToNFA()
@@ -239,6 +252,8 @@ class ExpToNFA:
                     node=model.nodes.pop()
                     model.handle_closure(node)
        
+        model.start_states=0
+        model.transitions.append((model.start_states,'#',model.check_start()))
         model.transitions=set(model.transitions)
         model.transitions=list(model.transitions)
         model.Print()
