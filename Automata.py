@@ -67,7 +67,6 @@ class Automata:
 
 
 
-
     def print(self):
         print("States:", self.states)
         print("Start State:", self.start_states)
@@ -95,6 +94,34 @@ class Automata:
             return plot
         # plot.show()
         plot.render(filename, format='png')
+
+def generateNFA(res: list):
+    nfa=Automata()
+
+    in_nodes = set()
+    out_nodes = set()
+
+    for t in res:
+        out_nodes.add(t[0])
+        in_nodes.add(t[2])
+
+        if t[1] == '#':
+            nfa.add_symbol(Automata.epsilon()) # 添加终结符
+            nfa.add_transition(t[0],Automata.epsilon(),t[2])
+        else:
+            nfa.add_symbol(t[1])
+            nfa.add_transition(t[0],t[1],t[2])
+
+    finals=in_nodes.difference(out_nodes)
+    nfa.add_final_state(finals) # 添加终态
+
+    nfa.add_start_state([0]) # 添加初态
+
+    all_nodes=in_nodes|out_nodes
+    for node in all_nodes:
+        nfa.add_state(node) # 添加状态节点
+
+    return nfa
 
 
 ## 子集法将nfa转为dfa
@@ -129,5 +156,11 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
     return dfa
 
 
+if __name__ == "__main__":
+    res = [(7, '#', 5), (9, '#', 7), (9, '#', 10), (4, '#', 8), (2, '#', 9), (5, 'd', 6), (1, 'l', 2), (7, '#', 3),
+           (3, 'l', 4), (6, '#', 8), (8, '#', 7), (8, '#', 10)]
 
+    nfa = generateNFA(res)
+    dfa = nfa_convert_to_dfa(nfa)
 
+    dfa.print()
