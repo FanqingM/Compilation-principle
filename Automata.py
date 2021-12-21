@@ -1,5 +1,6 @@
 import networkx as nx
 from graphviz import Source
+from graphviz import Digraph
 
 
 class Automata:
@@ -67,7 +68,6 @@ class Automata:
 
 
 
-
     def print(self):
         print("States:", self.states)
         print("Start State:", self.start_states)
@@ -75,26 +75,65 @@ class Automata:
         print("Transitions:", self.transitions)
         print("Alphabet:", self.alphabet)
 
-    ## 这是画图函数，环境原因没有实验
     def draw(self, filename=None):
-        G = nx.DiGraph()
-
+        # 实例化一个Digraph对象(有向图)，name:生成的图片的图片名，format:生成的图片格式
+        G = Digraph(name="NFATODFA", comment="test", format="png")
         for i in self.states:
-            s = 'doublecircle' if i in self.final_states else 'circle'
-            f = 'grey' if i == self.start_states else 'white'
-            G.add_node(i, shape=s, fillcolor=f, style='filled')
+            if i in self.final_states:
+                s = 'doublecircle'
+            else:
+                s = 'circle'
+            if i == self.start_states:
+                f = 'green'
+            else:
+                f = 'gray'
+            # s = 'doublecircle' if i in self.final_states else 'circle'
+            # f = 'grey' if i == self.start_state else 'green'
+            G.node(name = str(i),label = str(i),color = f,shape = s)
+            # G.add_node(i, shape=s, fillcolor=f, style='filled')
+
 
         for i, d in self.transitions.items():
             for k, v in d.items():
                 l = ','.join(v)
-                G.add_edge(i, k, label=l)
+                G.edge(str(i), str(k), label=l)
+        print(G.source)
+        
+        # 画图，filename:图片的名称，若无filename，则使用Digraph对象的name，默认会有gv后缀
+        # directory:图片保存的路径，默认是在当前路径下保存
+        G.view(filename="NFATODFA")
+        
+        # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
+        G.render(filename='NFATODFA',view=True)
 
-        plot = Source(nx.drawing.nx_agraph.to_agraph(G))
 
-        if not filename:
-            return plot
-        # plot.show()
-        plot.render(filename, format='png')
+def generateNFA(res: list):
+    nfa=Automata()
+
+    in_nodes = set()
+    out_nodes = set()
+
+    for t in res:
+        out_nodes.add(t[0])
+        in_nodes.add(t[2])
+
+        if t[1] == '#':
+            nfa.add_symbol(Automata.epsilon()) # 添加终结符
+            nfa.add_transition(t[0],Automata.epsilon(),t[2])
+        else:
+            nfa.add_symbol(t[1])
+            nfa.add_transition(t[0],t[1],t[2])
+
+    finals=in_nodes.difference(out_nodes)
+    nfa.add_final_state(finals) # 添加终态
+
+    nfa.add_start_state([0]) # 添加初态
+
+    all_nodes=in_nodes|out_nodes
+    for node in all_nodes:
+        nfa.add_state(node) # 添加状态节点
+
+    return nfa
 
 
 ## 子集法将nfa转为dfa
@@ -127,7 +166,15 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
         index+=1
     dfa.add_final_state(count)
     return dfa
+ 
+        
 
 
+if __name__ == "__main__":
+    res = [(7, '#', 5), (9, '#', 7), (9, '#', 10), (4, '#', 8), (2, '#', 9), (5, 'd', 6), (1, 'l', 2), (7, '#', 3),
+           (3, 'l', 4), (6, '#', 8), (8, '#', 7), (8, '#', 10)]
 
+    nfa = generateNFA(res)
+    dfa = nfa_convert_to_dfa(nfa)
 
+    dfa.print()
