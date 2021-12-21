@@ -11,13 +11,14 @@ class Node(object):
             self.begin_state=begin_state
             self.end_state=end_state
             self.symbol=symbol
+            
     def make_node(self,b_s,sym,e_s):
         return self.node(b_s,sym,e_s)
 
 class ExpToNFA:
-    def __init__(self):
+    def __init__(self,start):
         self.states=set() #状态集合
-        self.start_states=1 #起始状态
+        self.start_states=start #起始状态
         self.state_num=1 #总状态数
         self.final_states=set() #终止状态集合 
         self.transitions=[] #状态转移集
@@ -27,6 +28,8 @@ class ExpToNFA:
         self.nodes=[] #标识符转化成的node
         self.Nodes=Node()
         self.top=-1 #栈顶指针
+        self.connection=['(',')','|','*','-']
+
 
     def add_state(self,state):
         self.states.add(state)
@@ -57,9 +60,10 @@ class ExpToNFA:
        
         while(len(squence)>0):
             i=0
-            if(squence[i]<='z' and squence[i]>='a'):
+            # if(squence[i]<='z' and squence[i]>='a'):
+            if(squence[i] not in self.connection):
                 symbol.append(squence[i])
-                if(i+1<len(squence) and squence[i+1]<='z' and squence[i+1]>='a' ):
+                if(i+1<len(squence) and squence[i+1] not in self.connection):
                     connection.append('-')
                 elif (i+1<len(squence) and squence[i+1]=='('):
                     connection.append('-')
@@ -69,7 +73,7 @@ class ExpToNFA:
             else:
                 connection.append(squence[i])
                 if(i+1<len(squence) and (squence[i]=='*' or squence[i]==')') 
-                            and squence[i+1]<='z' and squence[i+1]>='a'):
+                            and squence[i+1] not in self.connection):
                     connection.append('-')   
                 squence.pop(i)              
         return symbol,connection
@@ -79,9 +83,9 @@ class ExpToNFA:
         i=0
         infix=list()
         while(len(squence)>0):
-             if(squence[i]<='z' and squence[i]>='a'):
+             if(squence[i] not in self.connection):
                  infix.append(squence[i])
-                 if(i+1<len(squence) and squence[i+1]<='z' and squence[i+1]>='a' ):
+                 if(i+1<len(squence) and squence[i+1] not in self.connection ):
                     infix.append('-')
                  elif (i+1<len(squence) and squence[i+1]=='('):
                     infix.append('-')
@@ -95,7 +99,7 @@ class ExpToNFA:
                 squence.pop(i)      
         
         for x in range(len(infix)):
-            if(infix[x]<='z' and infix[x]>='a'):    
+            if(infix[x] not in self.connection):    
                 infix[x]=self.nodes[i]
                 i+=1
                 
@@ -132,6 +136,7 @@ class ExpToNFA:
         for i in symbol:
             current_state=self.current_state
             node=self.Nodes.make_node(current_state,i,current_state+1)
+            self.transitions.append((current_state,i,current_state+1))
             self.nodes.append(node)
             self.current_state+=2
 
@@ -139,9 +144,9 @@ class ExpToNFA:
     #处理a|b
     def handle_unite(self,a,b):
     
-        if(a.symbol>='a' and a.symbol<='z'):
+        if(a.symbol not in self.connection):
             self.transitions.append((a.begin_state,a.symbol,a.end_state))
-        if(b.symbol>='a' and b.symbol<='z'):
+        if(b.symbol not in self.connection):
             self.transitions.append((b.begin_state,b.symbol,b.end_state))
 
         current_state=self.current_state
@@ -157,10 +162,10 @@ class ExpToNFA:
     #处理ab
     def handle_join(self,a,b):
         if(a.symbol=='|' or a.symbol=='+' or b.symbol=='|' or b.symbol=='+'):#左右至少一个节点集
-            if(a.symbol>='a' and a.symbol<='z'):
+            if(a.symbol not in self.connection):
                 self.transitions.append((a.begin_state,a.symbol,a.end_state))
                 self.transitions.append((a.end_state,'#',b.begin_state))
-            if(b.symbol>='a' and b.symbol<='z'):
+            if(b.symbol not in self.connection):
                 self.transitions.append((b.begin_state,b.symbol,b.end_state))
                 self.transitions.append((a.end_state,'#',b.begin_state))
             else:
@@ -180,7 +185,7 @@ class ExpToNFA:
         current_state=self.current_state
         # a.begin_state-=self.state_loss
         # a.end_state-=self.state_loss
-        if(a.symbol>='a' and a.symbol<='z'):
+        if(a.symbol not in self.connection):
             self.transitions.append((a.begin_state,a.symbol,a.end_state))
 
         self.transitions.append((current_state,'#',current_state+1))
@@ -220,16 +225,16 @@ class ExpToNFA:
         for i in range(len(self.transitions)):
             states.append(0)
         for i in self.transitions:
-            states[i[2]-1]=1
+            states[i[2]-self.start_states]=1
         for i in range(len(states)):
             if(states[i]==0):
                 start_state.append(i+1)
-        return start_state[0]
+        return start_state[0]+self.start_states
                 
 
     def convert(self,exp):
         
-        model=ExpToNFA()
+        model=ExpToNFA(self.start_states)
         squence=model.read_regular_expression(exp)
         symbol,connection=model.classify(squence)
         model.init_node(symbol)
@@ -252,26 +257,28 @@ class ExpToNFA:
                     node=model.nodes.pop()
                     model.handle_closure(node)
        
-        model.start_states=0
-        model.transitions.append((model.start_states,'#',model.check_start()))
+        # model.start_states=0
+        # model.transitions.append((model.start_states,'#',model.check_start()))
         model.transitions=set(model.transitions)
         model.transitions=list(model.transitions)
         model.Print()
-        nfa=Digraph('G',filename='NFA.gv',format='png')
-        for i in range(len(model.transitions)):
-            n1,sym,n2=str(model.transitions[i][0]),model.transitions[i][1],str(model.transitions[i][2])
-            nfa.edge(n1,n2,label=sym)
-        nfa.view()
-        model.print_matrix()
+        # nfa=Digraph('G',filename='NFA.gv',format='png')
+        # for i in range(len(model.transitions)):
+        #     n1,sym,n2=str(model.transitions[i][0]),model.transitions[i][1],str(model.transitions[i][2])
+        #     nfa.edge(n1,n2,label=sym)
+        # nfa.view()
+        # model.print_matrix()
+        return model.current_state,model.transitions
             
     
     def Print(self):
         print(self.transitions)
 
 #test              
-entity=ExpToNFA()
+# entity=ExpToNFA(1)
 # entity.convert('a*b(c|d)e')
 # entity.convert('(a|b)*cba')
-entity.convert('l(l|d)*')
+# entity.convert('l(l|d)*')
+# entity.convert('dd*')
 
  
