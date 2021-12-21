@@ -230,6 +230,19 @@ class ExpToNFA:
             if(states[i]==0):
                 start_state.append(i+1)
         return start_state[0]+self.start_states
+
+    def check_end(self):
+        states=list()
+        end_state=list()
+        for i in range(self.current_state):
+            states.append(0)
+        for i in self.transitions:
+            states[i[0]-self.start_states]=1
+        for i in range(len(states)):
+            if(states[i]==0):
+                end_state.append(i+1)
+        self.add_final_state(end_state[0]+self.start_states-1)
+        return end_state[0]+self.start_states
                 
 
     def convert(self,exp):
@@ -268,7 +281,8 @@ class ExpToNFA:
         #     nfa.edge(n1,n2,label=sym)
         # nfa.view()
         # model.print_matrix()
-        return model.current_state,model.transitions
+        model.check_end()
+        return model.current_state,model.transitions,model.final_states
             
     
     def Print(self):
