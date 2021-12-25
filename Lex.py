@@ -52,4 +52,8 @@ def NFA():
         NFAs.insert(0,(0,'#',i))
 
     draw(NFAs,end_states)
+    print(NFAs)
     return trans,end_states
+
+if __name__=="__main__":
+    NFA()
