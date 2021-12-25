@@ -77,7 +77,7 @@ class Automata:
 
     def draw(self, filename=None):
         # 实例化一个Digraph对象(有向图)，name:生成的图片的图片名，format:生成的图片格式
-        G = Digraph(name="NFATODFA", comment="test", format="png")
+        G = Digraph(name=filename, comment="test", format="png")
         for i in self.states:
             if i in self.final_states:
                 s = 'doublecircle'
@@ -97,14 +97,14 @@ class Automata:
             for k, v in d.items():
                 l = ','.join(v)
                 G.edge(str(i), str(k), label=l)
-        print(G.source)
+        #print(G.source)
         
         # 画图，filename:图片的名称，若无filename，则使用Digraph对象的name，默认会有gv后缀
         # directory:图片保存的路径，默认是在当前路径下保存
-        G.view(filename="NFATODFA")
+        G.view(filename=filename)
         
         # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
-        G.render(filename='NFATODFA',view=True)
+        #G.render(filename='NFATODFA',view=True)
 
 
 def generateNFA(res: list):
