@@ -101,10 +101,10 @@ class Automata:
         
         # 画图，filename:图片的名称，若无filename，则使用Digraph对象的name，默认会有gv后缀
         # directory:图片保存的路径，默认是在当前路径下保存
-        G.view(filename="NFATODFA")
+        # G.view(filename="NFATODFA")
         
         # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
-        G.render(filename='NFATODFA',view=True)
+        G.render(filename='NFATODFA',view=False)
 
 
 def generateNFA(res: list):

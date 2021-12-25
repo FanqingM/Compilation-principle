@@ -68,10 +68,10 @@ class DFA:
         
         # 画图，filename:图片的名称，若无filename，则使用Digraph对象的name，默认会有gv后缀
         # directory:图片保存的路径，默认是在当前路径下保存
-        G.view(filename="DFA")
+        # G.view(filename="DFA")
         
         # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
-        G.render(filename='DFA',view=True)
+        G.render(filename='DFA',view=False)
         
     ## 这个函数是用来找到最小划分的
     def hopcroft(self):
