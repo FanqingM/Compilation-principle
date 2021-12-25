@@ -143,7 +143,7 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
     e_closure.append(list(start_states))
     count=1
 
-    dfa=Automata(nfa.alphabet)
+    dfa=Automata(nfa.alphabet-set(nfa.epsilon()))
     dfa.add_state(count)
     dfa.add_start_state(count)
 
