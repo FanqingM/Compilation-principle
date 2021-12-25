@@ -101,10 +101,10 @@ class Automata:
         
         # 画图，filename:图片的名称，若无filename，则使用Digraph对象的name，默认会有gv后缀
         # directory:图片保存的路径，默认是在当前路径下保存
-        G.view(filename=filename)
+        # G.view(filename="NFATODFA")
         
         # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
-        #G.render(filename='NFATODFA',view=True)
+        G.render(filename='NFATODFA',view=False)
 
 
 def generateNFA(res: list):
@@ -143,7 +143,10 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
     e_closure.append(list(start_states))
     count=1
 
-    dfa=Automata(nfa.alphabet-set(nfa.epsilon()))
+    tmp=set()
+    tmp.add(nfa.epsilon())
+    dfa=Automata(nfa.alphabet.difference(tmp))
+    print("dfa的元素,",dfa.alphabet)
     dfa.add_state(count)
     dfa.add_start_state(count)
 
@@ -171,8 +174,8 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
 
 
 if __name__ == "__main__":
-    res = [(7, '#', 5), (9, '#', 7), (9, '#', 10), (4, '#', 8), (2, '#', 9), (5, 'd', 6), (1, 'l', 2), (7, '#', 3),
-           (3, 'l', 4), (6, '#', 8), (8, '#', 7), (8, '#', 10)]
+    res = [(8, '#', 10), (4, '#', 8), (3, 'l', 4), (6, '#', 8), (9, '#', 7), (7, '#', 3), (2, '#', 9), (1, 'l', 2), (9, '#', 10), (5, 'd', 6), (7, '#', 5), (8, '#', 7),
+(11, 'd', 12), (15, '#', 16), (14, '#', 16), (14, '#', 13), (15, '#', 13), (12, '#', 15), (13, 'd', 14)]
 
     nfa = generateNFA(res)
     dfa = nfa_convert_to_dfa(nfa)
