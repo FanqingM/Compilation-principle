@@ -1,8 +1,9 @@
 from Exp2NFA import *
+from Automata import *
 import graphviz
 
-def draw(transitions,end_states):
-        nfa=Digraph('G',filename='NFAs.gv',format='png')
+def Draw(transitions,end_states,f_n):
+        nfa=Digraph('G',filename=f_n,format='png')
         for i in range(len(transitions)):
             if(transitions[i][2] in end_states):
                 s='doublecircle'
@@ -51,5 +52,17 @@ def NFA():
     for i in begin_states:
         NFAs.insert(0,(0,'#',i))
 
-    draw(NFAs,end_states)
-    return trans,end_states
+    Draw(NFAs,end_states,'NFAs.gv')
+    return NFAs,end_states
+
+def DFA():
+    trans,end_states=NFA()
+    nfa=generateNFA(trans)
+    dfa=nfa_convert_to_dfa(nfa)
+    dfa.draw('DAFs.gv')
+    dfa.print()
+
+    return dfa
+
+NFA()
+DFA()

@@ -77,7 +77,7 @@ class Automata:
 
     def draw(self, filename=None):
         # 实例化一个Digraph对象(有向图)，name:生成的图片的图片名，format:生成的图片格式
-        G = Digraph(name="NFATODFA", comment="test", format="png")
+        G = Digraph(name=filename, comment="test", format="png")
         for i in self.states:
             if i in self.final_states:
                 s = 'doublecircle'
@@ -97,7 +97,7 @@ class Automata:
             for k, v in d.items():
                 l = ','.join(v)
                 G.edge(str(i), str(k), label=l)
-        print(G.source)
+        #print(G.source)
         
         # 画图，filename:图片的名称，若无filename，则使用Digraph对象的name，默认会有gv后缀
         # directory:图片保存的路径，默认是在当前路径下保存
@@ -143,7 +143,10 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
     e_closure.append(list(start_states))
     count=1
 
-    dfa=Automata(nfa.alphabet)
+    tmp=set()
+    tmp.add(nfa.epsilon())
+    dfa=Automata(nfa.alphabet.difference(tmp))
+    print("dfa的元素,",dfa.alphabet)
     dfa.add_state(count)
     dfa.add_start_state(count)
 
@@ -171,8 +174,8 @@ def nfa_convert_to_dfa(nfa:Automata)->Automata:
 
 
 if __name__ == "__main__":
-    res = [(7, '#', 5), (9, '#', 7), (9, '#', 10), (4, '#', 8), (2, '#', 9), (5, 'd', 6), (1, 'l', 2), (7, '#', 3),
-           (3, 'l', 4), (6, '#', 8), (8, '#', 7), (8, '#', 10)]
+    res = [(8, '#', 10), (4, '#', 8), (3, 'l', 4), (6, '#', 8), (9, '#', 7), (7, '#', 3), (2, '#', 9), (1, 'l', 2), (9, '#', 10), (5, 'd', 6), (7, '#', 5), (8, '#', 7),
+(11, 'd', 12), (15, '#', 16), (14, '#', 16), (14, '#', 13), (15, '#', 13), (12, '#', 15), (13, 'd', 14)]
 
     nfa = generateNFA(res)
     dfa = nfa_convert_to_dfa(nfa)
