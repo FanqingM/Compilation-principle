@@ -155,11 +155,14 @@ class DFA:
                     self.final_states.discard(fs)
     
     ## DFA代码化
-    def DFACode(self,variables):
+    def DFACode(self,variables,word=''):
         res = ""
+        t_tmp=''
+        result=[]
         for i in range(len(variables)):
             if variables[i] not in self.alphabet:
                 print("error")
+                result.append('error')
                 break
             if i == 0:
                 s = {variables[i]}
@@ -167,6 +170,7 @@ class DFA:
                 temp = get_key(self.transitions[self.start_state],s)
                 if len(temp) == 0:
                     print("error")
+                    result.append('error')
                     break
                 else:
                     t_tmp = temp[0]
@@ -179,6 +183,8 @@ class DFA:
                 temp = get_key(self.transitions[t_tmp],s)
                 if len(temp) == 0:
                     print("error")
+                    result.append('error')
+                    t_tmp=0
                     break
                 else:
                     t_tmp = temp[0]
@@ -186,7 +192,15 @@ class DFA:
                     #     res+=variables[i]
                     # print(t_tmp)
         if t_tmp in self.final_states:
-            res = "<" + "V," + variables + ">"
+            if(word!='' and 'K' in variables):
+                res='<'+'Keyword,'+word+'>'
+            elif(word==''):
+                res='<'+variables+'>'
+            else:
+                res = "<" + "Var," + word + ">"
+            result.append(res)
             print(res)
+        return result
+       
             
                 

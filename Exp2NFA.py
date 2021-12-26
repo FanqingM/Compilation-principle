@@ -28,7 +28,7 @@ class ExpToNFA:
         self.nodes=[] #标识符转化成的node
         self.Nodes=Node()
         self.top=-1 #栈顶指针
-        self.connection=['(',')','|','*','-']
+        self.connection=['(',')','|','*','_']
 
 
     def add_state(self,state):
@@ -64,9 +64,9 @@ class ExpToNFA:
             if(squence[i] not in self.connection):
                 symbol.append(squence[i])
                 if(i+1<len(squence) and squence[i+1] not in self.connection):
-                    connection.append('-')
+                    connection.append('_')
                 elif (i+1<len(squence) and squence[i+1]=='('):
-                    connection.append('-')
+                    connection.append('_')
                 squence.pop(i)
             
                
@@ -74,7 +74,7 @@ class ExpToNFA:
                 connection.append(squence[i])
                 if(i+1<len(squence) and (squence[i]=='*' or squence[i]==')') 
                             and squence[i+1] not in self.connection):
-                    connection.append('-')   
+                    connection.append('_')   
                 squence.pop(i)              
         return symbol,connection
 
@@ -86,16 +86,16 @@ class ExpToNFA:
              if(squence[i] not in self.connection):
                  infix.append(squence[i])
                  if(i+1<len(squence) and squence[i+1] not in self.connection ):
-                    infix.append('-')
+                    infix.append('_')
                  elif (i+1<len(squence) and squence[i+1]=='('):
-                    infix.append('-')
+                    infix.append('_')
                  squence.pop(i)
                  
              else:
                 infix.append(squence[i])
                 if(i+1<len(squence) and (squence[i]=='*' or squence[i]==')') 
                             and squence[i+1]<='z' and squence[i+1]>='a'):
-                    infix.append('-')   
+                    infix.append('_')   
                 squence.pop(i)      
         
         for x in range(len(infix)):
@@ -107,12 +107,12 @@ class ExpToNFA:
 
     #中缀转后缀
     def infixToPostfix(self,infixexpr):
-        priority={"(":1,'-':3,'|':2,'*':4}
+        priority={"(":1,'_':3,'|':2,'*':4}
         opStack = list()
         postfixList = []
         tokenList = list(infixexpr)
         for token in tokenList:
-            if token!='(' and token!=')' and token!='*' and token !='|' and token !='-':
+            if token!='(' and token!=')' and token!='*' and token !='|' and token !='_':
                 postfixList.append(token)
             elif token == '(':
                 opStack.append(token)
@@ -203,7 +203,7 @@ class ExpToNFA:
         alphabet.append('#')
         for i in range(self.current_state):
             for j in range(len(alphabet)):
-                trans.append('-')
+                trans.append('_')
         trans=np.array(trans)
         trans=trans.reshape(self.current_state,len(alphabet))
         for edge in self.transitions:
@@ -262,7 +262,7 @@ class ExpToNFA:
                     node2=model.nodes.pop()
                     node1=model.nodes.pop()
                     model.handle_unite(node1,node2)
-                elif(postfix[i]=='-'):
+                elif(postfix[i]=='_'):
                     node2=model.nodes.pop()
                     node1=model.nodes.pop()
                     model.handle_join(node1,node2)
@@ -275,12 +275,11 @@ class ExpToNFA:
         model.transitions=set(model.transitions)
         model.transitions=list(model.transitions)
         model.Print()
-        # nfa=Digraph('G',filename='NFA.gv',format='png')
-        # for i in range(len(model.transitions)):
-        #     n1,sym,n2=str(model.transitions[i][0]),model.transitions[i][1],str(model.transitions[i][2])
-        #     nfa.edge(n1,n2,label=sym)
-        # nfa.view()
-        # model.print_matrix()
+        nfa=Digraph('G',filename='NFA.gv',format='png')
+        for i in range(len(model.transitions)):
+            n1,sym,n2=str(model.transitions[i][0]),model.transitions[i][1],str(model.transitions[i][2])
+            nfa.edge(n1,n2,label=sym)
+        model.print_matrix()
         model.check_end()
         return model.current_state,model.transitions,model.final_states
             
