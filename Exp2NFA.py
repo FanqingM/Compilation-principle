@@ -134,6 +134,10 @@ class ExpToNFA:
     #给所有标识符初始化起始状态和终止状态
     def init_node(self,symbol):
         for i in symbol:
+            if(i=='{'):
+                i=='('
+            elif(i=='}'):
+                i==')'
             current_state=self.current_state
             node=self.Nodes.make_node(current_state,i,current_state+1)
             self.transitions.append((current_state,i,current_state+1))

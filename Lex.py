@@ -40,7 +40,7 @@ def NFA():
     bs=1
     NFAs=list()
     keyword=['PROGRAM','BEGIN','END','CONST','VAR','WHILE','DO','IF','THEN']
-    signs=['+','-','×','/',':=','=','<>','>','>=','<','<=',';',',']
+    signs=['+','-','×','/',':=','=','<>','>','>=','<','<=',';',',','{','}']
     begin_states=[bs]
     end_states=[]
 
@@ -102,9 +102,12 @@ def readProgram(program):
         if(program[i] not in signs and program[i]!=' '):
             if(i+1<len(program) and program[i+1]!=' '):
                 current_word+=program[i]
+            elif(i+1<len(program) and program[i+1]==' '):
+                 current_word+=program[i]
             elif(i+1==len(program)):
                 current_word+=program[i]
                 words.append(current_word)
+            
                 
 
         elif(program[i] in signs):
@@ -124,7 +127,6 @@ def readProgram(program):
 
         else:
             if(current_word!=''):
-                current_word+=program[i]
                 words.append(current_word)
                 current_word=''
     return words
@@ -140,6 +142,10 @@ def output(words,DFA):
         elif(word in signs):
             if(word =='*'):
                 word ='×'
+            elif(word=='('):
+                word='{'
+            elif(word==')'):
+                word=='}'
             res=DFA.DFACode(word)
         else:
             exp=[]

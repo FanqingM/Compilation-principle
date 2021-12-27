@@ -197,6 +197,10 @@ class DFA:
             elif(word==''):
                 if(variables=='×'):
                     variables='*'
+                elif(variables=='{'):
+                    variables='('
+                elif(variables=='}'):
+                    variables=')'
                 res='<'+variables+'>'
             else:
                 res = "<" + "Var," + word + ">"
