@@ -1,8 +1,17 @@
 // test
+
 digraph "DAFs.gv" {
 	1 [label=1 color=green shape=circle]
 	2 [label=2 color=gray shape=doublecircle]
 	3 [label=3 color=gray shape=doublecircle]
+	4 [label=4 color=gray shape=doublecircle]
+	5 [label=5 color=gray shape=doublecircle]
+	6 [label=6 color=gray shape=doublecircle]
+	6 [label=6 color=gray shape=circle]
+digraph {
+	1 [label=1 color=green shape=circle]
+	2 [label=2 color=gray shape=doublecircle]
+	3 [label=3 color=gray shape=circle]
 	4 [label=4 color=gray shape=doublecircle]
 	5 [label=5 color=gray shape=doublecircle]
 	6 [label=6 color=gray shape=doublecircle]
@@ -51,3 +60,31 @@ digraph "DAFs.gv" {
 	18 -> 18 [label=d]
 	21 -> 21 [label=d]
 }
+	21 -> 21 [label=d]
+}
+	1 -> 2 [label=">"]
+	1 -> 3 [label=":"]
+	1 -> 4 [label=K]
+	1 -> 5 [label="×"]
+	1 -> 6 [label="="]
+	1 -> 7 [label=l]
+	1 -> 8 [label=d]
+	1 -> 9 [label=","]
+	1 -> 10 [label=";"]
+	1 -> 11 [label="+"]
+	1 -> 12 [label="/"]
+	1 -> 13 [label="<"]
+	2 -> 14 [label="="]
+	3 -> 15 [label="="]
+	7 -> 16 [label=l]
+	7 -> 17 [label=d]
+	8 -> 18 [label=d]
+	13 -> 19 [label=">"]
+	13 -> 20 [label="="]
+	16 -> 16 [label=l]
+	16 -> 17 [label=d]
+	17 -> 16 [label=l]
+	17 -> 17 [label=d]
+	18 -> 18 [label=d]
+}
+

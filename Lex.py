@@ -4,7 +4,7 @@ import PIL
 from numpy import pad
 from Exp2NFA import *
 from Automata import *
-from minimizer import *
+from minimizer2 import *
 import graphviz
 import tkinter as tk
 
@@ -25,6 +25,7 @@ def Draw(transitions,end_states,f_n):
             nfa.node(name=n1,label=n1,color=c,shape='circle')
             nfa.node(name=n2,label=n2,color='grey',shape=s)
             nfa.edge(n1,n2,label=sym)
+<<<<<<< Updated upstream
 
 
 def convertDFA(dfa):
@@ -35,6 +36,9 @@ def convertDFA(dfa):
     dfa1.transitions = dfa.transitions
     dfa1.alphabet = dfa.alphabet
     return dfa1
+=======
+        # nfa.view()
+>>>>>>> Stashed changes
     
 def NFA():
     bs=1
@@ -83,14 +87,15 @@ def NFA():
 def formDFA(trans):
     nfa=generateNFA(trans)
     dfa=nfa_convert_to_dfa(nfa)
-    dfa.draw('DAFs.gv')
-    dfa.print()
+    # dfa.draw('DAFs.gv')
+    # dfa.print()
 
     return dfa
 
 def Minimize(dfa):
     dfa1=convertDFA(dfa)
     dfa1.minimize()
+    return dfa1
 
 def readProgram(program):
     signs=['+','-','*','/',':=','=','<>','>','>=','<','<=','(',')',';',',']
@@ -203,3 +208,15 @@ window.mainloop()
 # program="VAR i1,i2,3i;"
 # words=readProgram("VAR i1,i2,i3")
 
+<<<<<<< Updated upstream
+=======
+nfa,ends=NFA()
+dfa=formDFA(nfa)
+# dfa.draw()
+# print('\n')
+dfa.print()
+# print('\n')
+# mini=Minimize(dfa)
+# mini.print()
+# mini.draw()
+>>>>>>> Stashed changes
