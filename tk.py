@@ -353,14 +353,17 @@ class TkDemo():
     def displayRect3(self):
         global image3
         global im3
-        dfa1 = DFA()
-        dfa1.states = dfa.states
-        dfa1.start_state = dfa.start_states
-        dfa1.final_states = dfa.final_states
-        dfa1.transitions = dfa.transitions
-        dfa1.alphabet = dfa.alphabet
-        dfa1.minimize()
-        dfa1.draw()
+
+        from Exp2NFA import ExpToNFA
+
+        entity = ExpToNFA(1)
+        entity.convert('(a|b)*cba')
+
+        from Automata import generateNFA
+
+        nfa = generateNFA(entity.transitions)
+        nfa.draw()
+
         image3 = Image.open("DFA.png") 
         image3 = image3.resize((100,300)) 
         im3 = ImageTk.PhotoImage(image3)  
@@ -425,6 +428,6 @@ class TkDemo():
             f.write(self.agree.get())
             f.write('本调查问卷的真实性')
         messagebox.showinfo('Success', '恭喜您已成功提交 ')   # 显示对话框
-
 TkDemo()
+
 
