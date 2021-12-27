@@ -195,6 +195,8 @@ class DFA:
             if(word!='' and 'K' in variables):
                 res='<'+'Keyword,'+word+'>'
             elif(word==''):
+                if(variables=='×'):
+                    variables='*'
                 res='<'+variables+'>'
             else:
                 res = "<" + "Var," + word + ">"

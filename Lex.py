@@ -99,8 +99,13 @@ def readProgram(program):
     iteration=iter(range(len(program)))
 
     for i in iteration:
-        if(i+1<len(program) and program[i+1]!=' ' and program[i] not in signs and program[i]!=' '):
-            current_word+=program[i]
+        if(program[i] not in signs and program[i]!=' '):
+            if(i+1<len(program) and program[i+1]!=' '):
+                current_word+=program[i]
+            elif(i+1==len(program)):
+                current_word+=program[i]
+                words.append(current_word)
+                
 
         elif(program[i] in signs):
             words.append(current_word)
@@ -122,7 +127,6 @@ def readProgram(program):
                 current_word+=program[i]
                 words.append(current_word)
                 current_word=''
-
     return words
 
 def output(words,DFA):
@@ -134,7 +138,9 @@ def output(words,DFA):
             input='K'
             res=DFA.DFACode(input,word)
         elif(word in signs):
-                res=DFA.DFACode(word)
+            if(word =='*'):
+                word ='×'
+            res=DFA.DFACode(word)
         else:
             exp=[]
             for i in word:
@@ -185,10 +191,6 @@ Result.pack()
 
 
 window.mainloop()
-
-
-
-
 
 
 #program="VAR a,b,c;IF a>b c=a;a=b;b=a; a=a+b; b=a-b; WHILE a>0 a=a-1; "    

@@ -279,7 +279,7 @@ class ExpToNFA:
         for i in range(len(model.transitions)):
             n1,sym,n2=str(model.transitions[i][0]),model.transitions[i][1],str(model.transitions[i][2])
             nfa.edge(n1,n2,label=sym)
-        model.print_matrix()
+        # model.print_matrix()
         model.check_end()
         return model.current_state,model.transitions,model.final_states
             
