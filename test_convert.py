@@ -36,7 +36,7 @@ nfa.add_transition(6,'b',6)
 dfa=nfa_convert_to_dfa(nfa)
 
 dfa.print()
-dfa.draw()
+# dfa.draw()
 
 dfa1.states = dfa.states
 dfa1.start_state = dfa.start_states
@@ -52,7 +52,7 @@ print(type(dfa1))
 # dfa.draw('x.png')
 
 # Minimize
-dfa1.minimize()
+# dfa1.minimize()
 
 # Print and Draw After Diagram
 print('=' * 10, 'After Minimization', '=' * 10)

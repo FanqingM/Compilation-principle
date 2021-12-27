@@ -32,7 +32,7 @@ dfa.add_transition(4, '0', 1)
 # Print and Draw Before Diagram
 print('=' * 10, 'Before Minimization', '=' * 10)
 dfa.print()
-dfa.draw("dfa_before")
+# dfa.draw("dfa_before")
 
 # Minimize
 dfa.minimize()
@@ -40,4 +40,4 @@ dfa.minimize()
 # Print and Draw After Diagram
 print('=' * 10, 'After Minimization', '=' * 10)
 dfa.print()
-dfa.draw("dfa_after")
+# dfa.draw("dfa_after")
