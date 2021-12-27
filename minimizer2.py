@@ -1,6 +1,8 @@
 import networkx as nx
 from graphviz import Source
 from graphviz import Digraph
+import random
+from copy import deepcopy
 
 def get_key (dict, value):
     return [k for k, v in dict.items() if v == value]
@@ -31,9 +33,9 @@ class DFA:
             self.transitions.update({f_state: {}})
 
         if t_state not in self.transitions[f_state]:
-            self.transitions[f_state].update({t_state: set()})
+            self.transitions[f_state].update({t_state: str()})
 
-        self.transitions[f_state][t_state].add(symbol)
+        self.transitions[f_state][t_state] = symbol
 
     def print(self):
         print("States:", self.states)
@@ -71,49 +73,105 @@ class DFA:
         # G.view(filename="DFA")
         
         # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
-        G.render(filename='DFA',view=True)
-        
-    ## 这个函数是用来找到最小划分的
-    def hopcroft(self):
-        P = [ self.final_states, self.states.difference(self.final_states) ]
-        ## P一开始是起始态和终止态的划分，最后经过迭代变成最终的划分
-        W = [ self.final_states ]
+        G.render(filename='DFA',view=False)
+    
+    
+    def hopcroft( self ):
+        cins                   = self.alphabet
+        termination_states     = self.final_states
+        total_states           = self.states
+        state_transition_map   = self.transitions
+        not_termination_states = total_states - termination_states
 
-        while len(W) > 0:
-            A = W.pop()  ## 注意这东西pop出来的是一个set
+        print("cins", cins)
+        print("termination_states",termination_states)
+        print("total_states",total_states)
+        print("state_transition_map",state_transition_map)
+    
+        def get_source_set( target_set, char ):
+            source_set = set()
+            for state in total_states:
+                try:
+                    if state_transition_map[state][char] in target_set:
+                        source_set.update( state )
+                except KeyError:
+                    pass
+            return source_set
+    
+        P = [ termination_states, not_termination_states ]
+        W = [ termination_states, not_termination_states ]
+    
+        while W:
             
-            for c in self.alphabet:
-                X = set()
-                for f_state, t_state in self.transitions.items():
-                    ## f是起始状态，t是接受字母，以及接受字母后跳转到的状态，一个f可能有多个t
-                    for k, s in t_state.items():
-                        if c in s and k in A:
-                            X.update(set([f_state]))
-                            ## update方法是合并集合
-                            ## 如果存在一个字母表中的字符使得这个状态接受这个字符后跳到终态，那么将这个状态合并进X
-                            ## X是接受一个字符可以到终态的集合
-
+            A = random.choice( W )
+            W.remove( A )
+    
+            for char in cins:
+                X = get_source_set( A, char )
+                P_temp = []
+                
                 for Y in P:
-                    if X.intersection(Y) != set() and Y.difference(X) != set():
-                        ## 当现在的分解的list中存在一个set，以及字母表中的一个元素，使得这个set经过这个元素
-                        ## 后，跳转到的状态的集合不全在分解的集合的子集中，就把Y分解，重新加入结果集
-                        P.append(X.intersection(Y))
-                        P.append(Y.difference(X))
-                        P.remove(Y)
-
-                        ## 之后我们还需要更新W
+                    S  = X & Y
+                    S1 = Y - X
+                    
+                    if len( S ) and len( S1 ):
+                        P_temp.append( S )
+                        P_temp.append( S1 )
+                        
                         if Y in W:
-                            W.append(X.intersection(Y))
-                            W.append(Y.difference(X))
-                            W.remove(Y)
+                            W.remove( Y )    
+                            W.append( S )
+                            W.append( S1 )
                         else:
-                            if len(X.intersection(Y)) <= len(Y.difference(X)):
-                                W.append(X.intersection(Y))
+                            if len( S ) <= len( S1 ):
+                                W.append( S )
                             else:
-                                W.append(Y.difference(X))
-        # print('hopcroft', P)
-        ## 通过这个算法，可以产出最小化划分
+                                W.append( S1 )
+                    else:
+                        P_temp.append( Y )
+                P = deepcopy( P_temp )
         return P
+    # ## 这个函数是用来找到最小划分的
+    # def hopcroft(self):
+    #     P = [ self.final_states, self.states.difference(self.final_states) ]
+    #     ## P一开始是起始态和终止态的划分，最后经过迭代变成最终的划分
+    #     W = [ self.final_states ]
+
+    #     while len(W) > 0:
+    #         A = W.pop()  ## 注意这东西pop出来的是一个set
+            
+    #         for c in self.alphabet:
+    #             X = set()
+    #             for f_state, t_state in self.transitions.items():
+    #                 ## f是起始状态，t是接受字母，以及接受字母后跳转到的状态，一个f可能有多个t
+    #                 for k, s in t_state.items():
+    #                     if c in s and k in A:
+    #                         X.update(set([f_state]))
+    #                         ## update方法是合并集合
+    #                         ## 如果存在一个字母表中的字符使得这个状态接受这个字符后跳到终态，那么将这个状态合并进X
+    #                         ## X是接受一个字符可以到终态的集合
+
+    #             for Y in P:
+    #                 if X.intersection(Y) != set() and Y.difference(X) != set():
+    #                     ## 当现在的分解的list中存在一个set，以及字母表中的一个元素，使得这个set经过这个元素
+    #                     ## 后，跳转到的状态的集合不全在分解的集合的子集中，就把Y分解，重新加入结果集
+    #                     P.append(X.intersection(Y))
+    #                     P.append(Y.difference(X))
+    #                     P.remove(Y)
+
+    #                     ## 之后我们还需要更新W
+    #                     if Y in W:
+    #                         W.append(X.intersection(Y))
+    #                         W.append(Y.difference(X))
+    #                         W.remove(Y)
+    #                     else:
+    #                         if len(X.intersection(Y)) <= len(Y.difference(X)):
+    #                             W.append(X.intersection(Y))
+    #                         else:
+    #                             W.append(Y.difference(X))
+    #     # print('hopcroft', P)
+    #     ## 通过这个算法，可以产出最小化划分
+    #     return P
 
     def minimize(self):
         min_states = self.hopcroft()
@@ -161,14 +219,11 @@ class DFA:
                     self.final_states.discard(fs)
     
     ## DFA代码化
-    def DFACode(self,variables,word=''):
+    def DFACode(self,variables):
         res = ""
-        t_tmp=''
-        result=[]
         for i in range(len(variables)):
             if variables[i] not in self.alphabet:
                 print("error")
-                result.append('error')
                 break
             if i == 0:
                 s = {variables[i]}
@@ -176,7 +231,6 @@ class DFA:
                 temp = get_key(self.transitions[self.start_state],s)
                 if len(temp) == 0:
                     print("error")
-                    result.append('error')
                     break
                 else:
                     t_tmp = temp[0]
@@ -189,8 +243,6 @@ class DFA:
                 temp = get_key(self.transitions[t_tmp],s)
                 if len(temp) == 0:
                     print("error")
-                    result.append('error')
-                    t_tmp=0
                     break
                 else:
                     t_tmp = temp[0]
@@ -198,17 +250,7 @@ class DFA:
                     #     res+=variables[i]
                     # print(t_tmp)
         if t_tmp in self.final_states:
-            if(word!='' and 'K' in variables):
-                res='<'+'Keyword,'+word+'>'
-            elif(word==''):
-                if(variables=='×'):
-                    variables='*'
-                res='<'+variables+'>'
-            else:
-                res = "<" + "Var," + word + ">"
-            result.append(res)
+            res = "<" + "V," + variables + ">"
             print(res)
-        return result
-       
             
                 

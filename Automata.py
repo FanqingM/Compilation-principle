@@ -38,6 +38,7 @@ class Automata:
             self.transitions[f_state].update({t_state: set()})
 
         self.transitions[f_state][t_state].add(symbol)
+        print(self.transitions[f_state][t_state])
 
     def get_e_closure(self,state)->set:
         allstates=set()
@@ -73,6 +74,7 @@ class Automata:
         print("Start State:", self.start_states)
         print("Final States:", self.final_states)
         print("Transitions:", self.transitions)
+        
         print("Alphabet:", self.alphabet)
 
     def draw(self, filename=None):
@@ -104,7 +106,7 @@ class Automata:
         # G.view(filename="NFATODFA")
         
         # 跟view一样的用法(render跟view选择一个即可)，一般用render生成图片，不使用view=True,view=True用在调试的时候
-        G.render(filename='NFATODFA',view=False)
+        G.render(filename='NFATODFA',view=True)
 
 
 def generateNFA(res: list):

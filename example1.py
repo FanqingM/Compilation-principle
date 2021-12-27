@@ -42,7 +42,7 @@ b = "bbaa"
 # Print and Draw Before Diagram
 print('=' * 10, 'Before Minimization', '=' * 10)
 dfa.print()
-dfa.draw()
+# dfa.draw()
 
 # Minimize
 dfa.minimize()
@@ -50,6 +50,8 @@ dfa.minimize()
 # Print and Draw After Diagram
 print('=' * 10, 'After Minimization', '=' * 10)
 dfa.print()
-
-dfa.DFACode(b)
+print('=' * 10, '在最小化一次', '=' * 10)
+dfa.minimize()
+dfa.print()
+# dfa.DFACode(b)
 # dfa.draw("dfa_after")
