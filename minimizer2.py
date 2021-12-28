@@ -4,6 +4,9 @@ from graphviz import Digraph
 import random
 from copy import deepcopy
 
+from Automata import Automata
+
+
 def get_key (dict, value):
     return [k for k, v in dict.items() if v == value]
 
@@ -253,4 +256,5 @@ class DFA:
             res = "<" + "V," + variables + ">"
             print(res)
             
-                
+
+

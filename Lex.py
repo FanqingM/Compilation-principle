@@ -25,7 +25,7 @@ def Draw(transitions,end_states,f_n):
             nfa.node(name=n1,label=n1,color=c,shape='circle')
             nfa.node(name=n2,label=n2,color='grey',shape=s)
             nfa.edge(n1,n2,label=sym)
-<<<<<<< Updated upstream
+        nfa.render(filename=f_n, view=True)
 
 
 def convertDFA(dfa):
@@ -36,10 +36,8 @@ def convertDFA(dfa):
     dfa1.transitions = dfa.transitions
     dfa1.alphabet = dfa.alphabet
     return dfa1
-=======
-        # nfa.view()
->>>>>>> Stashed changes
-    
+
+
 def NFA():
     bs=1
     NFAs=list()
@@ -76,7 +74,7 @@ def NFA():
         begin_states.append(bs)
         NFAs.extend(trans)
         end_states.extend(ends)
-        
+
     begin_states.pop()
     for i in begin_states:
         NFAs.insert(0,(0,'#',i))
@@ -112,8 +110,8 @@ def readProgram(program):
             elif(i+1==len(program)):
                 current_word+=program[i]
                 words.append(current_word)
-            
-                
+
+
 
         elif(program[i] in signs):
             words.append(current_word)
@@ -170,7 +168,7 @@ def transfer():
     dfa=formDFA(nfa)
     dfa1=convertDFA(dfa)
     result=output(words,dfa1)
-    Result.delete(0, "end") 
+    Result.delete(0, "end")
     for i in result:
         Result.insert("end",i)
 
@@ -204,19 +202,8 @@ Result.pack()
 window.mainloop()
 
 
-#program="VAR a,b,c;IF a>b c=a;a=b;b=a; a=a+b; b=a-b; WHILE a>0 a=a-1; "    
+#program="VAR a,b,c;IF a>b c=a;a=b;b=a; a=a+b; b=a-b; WHILE a>0 a=a-1; "
 # program="VAR i1,i2,3i;"
 # words=readProgram("VAR i1,i2,i3")
 
-<<<<<<< Updated upstream
-=======
-nfa,ends=NFA()
-dfa=formDFA(nfa)
-# dfa.draw()
-# print('\n')
-dfa.print()
-# print('\n')
-# mini=Minimize(dfa)
-# mini.print()
-# mini.draw()
->>>>>>> Stashed changes
+

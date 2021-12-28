@@ -2,6 +2,9 @@ import networkx as nx
 from graphviz import Source
 from graphviz import Digraph
 
+from Automata import Automata
+
+
 def get_key (dict, value):
     return [k for k, v in dict.items() if v == value]
 
@@ -213,6 +216,17 @@ class DFA:
             result.append(res)
             print(res)
         return result
-       
+
+    @staticmethod
+    def generateDFA(dfa:Automata):
+        dfa_1=DFA()
+        dfa_1.states = dfa.states
+        dfa_1.start_state = dfa.start_states
+        dfa_1.final_states = dfa.final_states
+        dfa_1.transitions = dfa.transitions
+        dfa_1.alphabet = dfa.alphabet
+
+        return dfa_1
+
             
                 
